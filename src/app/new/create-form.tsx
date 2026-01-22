@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { format } from "date-fns";
+import { fromZonedTime } from "date-fns-tz"; 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -11,7 +12,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardFooter } from "@/componen
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
 import { toast } from "sonner";
-import { Loader2, Sparkles, CalendarIcon, Clock, XCircle, Globe, Info } from "lucide-react"; 
+import { Loader2, Sparkles, CalendarIcon, Clock, X, Globe, Info, Plus, UserPlus } from "lucide-react"; 
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
@@ -29,32 +30,33 @@ for (let hour = WORKING_HOURS_START; hour <= WORKING_HOURS_END; hour++) {
 
 interface AvailabilitySlot {
   creator: string;     
-  participant: string; 
 }
 
 interface AvailabilityContext {
+  id: string;
   name: string;
   timezone: string;
   workingHoursInLocal: string; 
-  timeDifference: string; // e.g. "+7 hrs"
+  timeDifference: string;
 }
 
-export default function CreateForm({ users }: { users: any[] }) {
+export default function CreateForm({ users, currentUser }: { users: any[], currentUser: any }) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(false);
   
   const [slots, setSlots] = useState<AvailabilitySlot[]>([]);
-  const [context, setContext] = useState<AvailabilityContext | null>(null);
+  const [contexts, setContexts] = useState<AvailabilityContext[]>([]);
   
   const [isCalendarOpen, setIsCalendarOpen] = useState(false);
+
+  const [selectedUserIds, setSelectedUserIds] = useState<string[]>([]);
 
   const [formData, setFormData] = useState({
     title: "",
     date: "", 
     startTime: "",
     endTime: "",
-    participantId: "",
   });
 
   const [calendarDate, setCalendarDate] = useState<Date | undefined>(undefined);
@@ -70,19 +72,27 @@ export default function CreateForm({ users }: { users: any[] }) {
     }
   };
 
+  const handleAddUser = (userId: string) => {
+      if (!selectedUserIds.includes(userId)) {
+          setSelectedUserIds([...selectedUserIds, userId]);
+      }
+  };
+
+  const handleRemoveUser = (userId: string) => {
+      setSelectedUserIds(selectedUserIds.filter(id => id !== userId));
+  };
+
   useEffect(() => {
     const fetchAvailability = async () => {
       if (!formData.date) return;
       
       setChecking(true);
       setSlots([]); 
-      setContext(null);
-
-      const cleanParticipantId = formData.participantId === "none" ? "" : formData.participantId;
+      setContexts([]);
 
       const query = new URLSearchParams({
         date: formData.date,
-        participantId: cleanParticipantId
+        participantIds: selectedUserIds.join(",") 
       });
 
       try {
@@ -90,7 +100,7 @@ export default function CreateForm({ users }: { users: any[] }) {
         const data = await res.json();
         
         if (data.slots) setSlots(data.slots);
-        if (data.context) setContext(data.context);
+        if (data.contexts) setContexts(data.contexts);
         
       } catch (e) {
         console.error("Failed to check availability");
@@ -104,7 +114,7 @@ export default function CreateForm({ users }: { users: any[] }) {
     }, 500);
 
     return () => clearTimeout(timeoutId);
-  }, [formData.date, formData.participantId]);
+  }, [formData.date, selectedUserIds]); 
 
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -115,18 +125,19 @@ export default function CreateForm({ users }: { users: any[] }) {
     }
     setLoading(true);
 
-    const cleanParticipantId = formData.participantId === "none" ? "" : formData.participantId;
+    const startString = `${formData.date}T${formData.startTime}:00`;
+    const endString = `${formData.date}T${formData.endTime}:00`;
 
-    const start = new Date(`${formData.date}T${formData.startTime}`).toISOString();
-    const end = new Date(`${formData.date}T${formData.endTime}`).toISOString();
+    const startCorrected = fromZonedTime(startString, currentUser.preferred_timezone);
+    const endCorrected = fromZonedTime(endString, currentUser.preferred_timezone);
 
     const res = await fetch("/api/appointments", {
       method: "POST",
       body: JSON.stringify({
         title: formData.title,
-        start,
-        end,
-        participantId: cleanParticipantId,
+        start: startCorrected.toISOString(),
+        end: endCorrected.toISOString(),
+        participantIds: selectedUserIds,
       }),
     });
 
@@ -158,9 +169,11 @@ export default function CreateForm({ users }: { users: any[] }) {
 
   const getOffsetBadgeColor = (diff: string) => {
     if (diff.includes("+")) return "bg-emerald-100 text-emerald-700 border-emerald-200"; 
-    if (diff.includes("-")) return "bg-amber-100 text-amber-700 border-amber-200"; 
+    if (diff.includes("-")) return "bg-amber-100 text-amber-700 border-amber-200";   
     return "bg-slate-100 text-slate-700 border-slate-200"; 
   };
+
+  const availableUsersToSelect = users.filter(u => !selectedUserIds.includes(u.id));
 
   return (
     <Card className="w-[500px] shadow-lg">
@@ -178,23 +191,49 @@ export default function CreateForm({ users }: { users: any[] }) {
             />
           </div>
           
-          <div className="space-y-2 flex flex-col">
-            <Label className="mb-2">Invite Colleague (Optional)</Label>
-            <Select onValueChange={(val) => setFormData({ ...formData, participantId: val })}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a user to invite" />
+          {/* --- MULTI SELECT USER UI --- */}
+          <div className="space-y-3">
+            <Label>Invite Colleagues</Label>
+            
+            {/* List User Terpilih */}
+            {selectedUserIds.length > 0 && (
+                <div className="flex flex-wrap gap-2 mb-2">
+                    {selectedUserIds.map(id => {
+                        const user = users.find(u => u.id === id);
+                        return (
+                            <Badge key={id} variant="secondary" className="pl-2 pr-1 py-1 flex items-center gap-1">
+                                {user?.name}
+                                <button 
+                                    type="button"
+                                    onClick={() => handleRemoveUser(id)}
+                                    className="ml-1 hover:bg-slate-200 rounded-full p-0.5 transition-colors"
+                                >
+                                    <X className="w-3 h-3 text-muted-foreground" />
+                                </button>
+                            </Badge>
+                        )
+                    })}
+                </div>
+            )}
+
+            {/* Dropdown buat nambah user */}
+            <Select onValueChange={handleAddUser} value="">
+              <SelectTrigger className="w-full">
+                 <div className="flex items-center gap-2 text-muted-foreground">
+                    <UserPlus className="w-4 h-4" />
+                    <SelectValue placeholder="Add participant..." />
+                 </div>
               </SelectTrigger>
               <SelectContent position="popper">
-                <SelectItem value="none" className="text-muted-foreground italic font-medium">
-                    <div className="flex items-center gap-2">
-                        <XCircle className="w-4 h-4" /> No one (Clear selection)
-                    </div>
-                </SelectItem>
-                {users.map((u) => (
-                  <SelectItem key={u.id} value={u.id}>
-                    {u.name} ({u.preferred_timezone})
-                  </SelectItem>
-                ))}
+                {availableUsersToSelect.length === 0 ? (
+                    <div className="p-2 text-sm text-center text-muted-foreground">No more users to add</div>
+                ) : (
+                    availableUsersToSelect.map((u) => (
+                    <SelectItem key={u.id} value={u.id}>
+                        {u.name} ({u.preferred_timezone})
+                    </SelectItem>
+                    ))
+                )}
               </SelectContent>
             </Select>
           </div>
@@ -234,27 +273,31 @@ export default function CreateForm({ users }: { users: any[] }) {
             </Popover>
           </div>
 
+          {/* --- SMART AVAILABILITY INSIGHT --- */}
           {formData.date && (
             <div className="bg-slate-50 p-4 rounded-lg border border-slate-100 space-y-3">
                 <div className="flex items-center gap-2 text-sm font-medium text-slate-800">
                     <Sparkles className="w-4 h-4 text-purple-500" />
-                    {checking ? "Analyzing schedules..." : "Availability Insight"}
+                    {checking ? "Analyzing everyone's schedule..." : "Matching working hours"}
                 </div>
                 
-                {!checking && context && (
-                  <div className="text-xs bg-white p-3 rounded border border-purple-100 text-slate-600 space-y-2 shadow-sm">
-                     <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5 font-medium text-purple-700">
-                            <Globe className="w-3 h-3" />
-                            {context.name} is in {context.timezone}
+                {/* List Context Tiap User */}
+                {!checking && contexts.length > 0 && (
+                  <div className="space-y-2">
+                      {contexts.map(ctx => (
+                        <div key={ctx.id} className="text-xs bg-white p-2 rounded border border-purple-100 text-slate-600 flex items-center justify-between shadow-sm">
+                            <div className="flex items-center gap-2">
+                                <Globe className="w-3 h-3 text-purple-500" />
+                                <span className="font-medium text-slate-700">{ctx.name}</span>
+                            </div>
+                            <div className="flex items-center gap-2">
+                                <span className="text-slate-500">{ctx.workingHoursInLocal} (Yours)</span>
+                                <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-semibold border", getOffsetBadgeColor(ctx.timeDifference))}>
+                                    {ctx.timeDifference}
+                                </span>
+                            </div>
                         </div>
-                        <span className={cn("px-1.5 py-0.5 rounded text-[10px] font-semibold border", getOffsetBadgeColor(context.timeDifference))}>
-                            {context.timeDifference}
-                        </span>
-                     </div>
-                     <p className="leading-relaxed">
-                        Their working hours (08:00 - 17:00) align with <span className="font-bold text-slate-800 bg-slate-100 px-1 rounded">{context.workingHoursInLocal}</span> in your time.
-                     </p>
+                      ))}
                   </div>
                 )}
 
@@ -268,27 +311,23 @@ export default function CreateForm({ users }: { users: any[] }) {
                                 onClick={() => applySuggestion(slot)}
                             >
                                 <span className="font-bold text-sm">{slot.creator}</span>
-                                {slot.participant && (
-                                   <span className="text-[10px] opacity-60 font-normal">
-                                      Their {slot.participant}
-                                   </span>
-                                )}
                             </Badge>
                         ))}
                     </div>
                 )}
                 
-                {!checking && slots.length === 0 && !formData.participantId && (
-                     <p className="text-xs text-muted-foreground">Select a participant to see overlap insights.</p>
-                )}
-                {!checking && slots.length === 0 && formData.participantId && (
+                {!checking && slots.length === 0 && selectedUserIds.length > 0 && (
                      <p className="text-xs text-red-500 flex items-center gap-1">
-                        <Info className="w-3 h-3" /> No overlapping working hours on this date.
+                        <Info className="w-3 h-3" /> No common working hours found for this group on this date.
                      </p>
+                )}
+                 {!checking && slots.length === 0 && selectedUserIds.length === 0 && (
+                     <p className="text-xs text-muted-foreground">Add participants to see matching hour insights.</p>
                 )}
             </div>
           )}
 
+          {/* Time Inputs (Sama Saja) */}
           <div className="grid grid-cols-2 gap-4">
             <div className="space-y-2 flex flex-col">
               <Label className="mb-2">Start Time</Label>
