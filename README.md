@@ -1,36 +1,90 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+<div align="center">
 
-## Getting Started
+<h1> Sari Tirta Appointment System 📅</h1>
 
-First, run the development server:
+<em>A smart appointment management tool designed to automatically handle timezone conflicts for seamless scheduling.</em>
+
+[![Next.js](https://img.shields.io/badge/Next.js-000000?style=for-the-badge&logo=nextdotjs&logoColor=white)](https://nextjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-3178C6?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://supabase.com/)
+[![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+
+The Sari Tirta Appointment System is a robust web application built to solve the complexity of cross-timezone scheduling. It features intelligent validation logic that ensures appointments are only scheduled within valid working hours (08:00 - 17:00) for all participants, regardless of their location in the world.
+
+<img src="documentations/login.png" alt="image" border="0">
+
+</div>
+
+<div align="left">
+
+<h1> 📑 Table of Contents </h1>
+
+- [Installation & Setup 💻](#installation--setup-)
+- [Database Configuration 🗄️](#database-configuration-)
+- [Demo Accounts 🧪](#demo-accounts-)
+- [Features List 🔮](#features-list-)
+
+</div>
+
+## Installation & Setup 💻
+
+To clone and run this application, you'll need [Git](https://git-scm.com) and [Node.js v18+](https://nodejs.org/) installed on your computer. From your command line:
+
+<br>
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Clone this repository
+$ git clone [https://github.com/username/sari-tirta-app](https://github.com/username/sari-tirta-app)
+# Go into the repository
+$ cd sari-tirta-app
+# Install dependencies
+$ npm install
+# Run the app locally
+$ npm run dev
+
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Database Configuration 🗄️
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+This application connects to a live **Supabase PostgreSQL** database. You do not need to install a local database engine (like XAMPP or Postgres Local).
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+# 1. Locate the example environment file
+# It contains the active connection string for the testing database
+$ ls .env.example
 
-## Learn More
+# 2. Rename it to .env
+# Linux/Mac:
+$ mv .env.example .env
+# Windows (Command Prompt):
+$ ren .env.example .env
 
-To learn more about Next.js, take a look at the following resources:
+# 3. (Optional) If you want to use your own database schema:
+$ npx prisma db push
+$ npx prisma db seed
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Demo Accounts 🧪
 
-## Deploy on Vercel
+You can use these pre-registered accounts to simulate timezone conflicts without creating new users:
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+| Username | Role Scenario | Timezone | Notes |
+| --- | --- | --- | --- |
+| **tester** | Main User (You) | `Asia/Jakarta` | Use this to create appointments. |
+| **john** | European Colleague | `Europe/London` | Try inviting him at 08:00 WIB (Invalid). |
+| **sarah** | US Colleague | `America/New_York` | Try inviting her. |
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+*(Note: The login system uses simple username authentication. No password is required.)*
+
+## Features List 🔮
+
+* [x] <b>Smart Timezone Scheduling</b>: Automatic detection and validation of working hours for all participants.
+* [x] <b>Availability Insight:</b> Visual indicators showing if a participant is available or outside working hours.
+* [x] <b>Secure Authentication:</b> Session-based login (JWT) with HTTP-Only Cookies protection.
+* [x] <b>Double-Side Validation:</b> Server-side logic to prevent scheduling errors via API manipulation.
+* [x] <b>Responsive UI:</b> Modern interface built with Tailwind CSS and Shadcn UI.
+* [ ] <b>Google Calendar Sync:</b> Two-way synchronization with personal calendars.
+* [ ] <b>Email Notifications:</b> SMTP integration for RSVP invitations.
+* [ ] <b>Recurring Appointments:</b> Support for weekly or monthly meeting series.
