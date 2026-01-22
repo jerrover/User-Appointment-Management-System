@@ -1,6 +1,6 @@
 <div align="center">
 
-<h1> Sari Tirta Appointment System 📅</h1>
+<h1> User Appointment Management System 📅</h1>
 
 <em>A smart appointment management tool designed to automatically handle timezone conflicts for seamless scheduling.</em>
 
@@ -10,9 +10,9 @@
 [![PostgreSQL](https://img.shields.io/badge/PostgreSQL-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://supabase.com/)
 [![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
 
-The Sari Tirta Appointment System is a robust web application built to solve the complexity of cross-timezone scheduling. It features intelligent validation logic that ensures appointments are only scheduled within valid working hours (08:00 - 17:00) for all participants, regardless of their location in the world.
+The ST Appointment System is a robust web application built to solve the complexity of cross-timezone scheduling. It features intelligent validation logic that ensures appointments are only scheduled within valid working hours (08:00 - 17:00) for all participants, regardless of their location in the world.
 
-<img src="documentations/login.png" alt="Sari Tirta Login" width="70%" border="0">
+<img src="documentations/login.png" alt="ST Login" width="70%" border="0">
 
 </div>
 
