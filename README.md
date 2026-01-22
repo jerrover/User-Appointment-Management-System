@@ -87,13 +87,13 @@ This application connects to a live **Supabase PostgreSQL** database. You do not
 ```bash
 # 1. Locate the example environment file
 # It contains the active connection string for the testing database
-$ ls .env.example
+ls .env.example
 
 # 2. Rename it to .env
 # Linux/Mac:
-$ mv .env.example .env
+mv .env.example .env
 # Windows (Command Prompt):
-$ ren .env.example .env
+ren .env.example .env
 
 ```
 
