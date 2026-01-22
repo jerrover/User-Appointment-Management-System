@@ -63,7 +63,7 @@ From your command line:
 
 ```bash
 # 1. Clone this repository
-git clone [https://github.com/jerrover/User-Appointment-Management-System](https://github.com/jerrover/User-Appointment-Management-System)
+git clone https://github.com/jerrover/User-Appointment-Management-System
 
 # 2. Go into the project directory
 cd User-Appointment-Management-System
