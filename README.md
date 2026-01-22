@@ -22,6 +22,16 @@ The Sari Tirta Appointment System is a robust web application built to solve the
 
 A visual overview of the application's key features and smart functionalities.
 
+### 🎥 Live Demo Preview
+<div align="center">
+  <a href="https://youtu.be/Z_4qxpQkfXc" target="_blank">
+    <img src="https://img.youtube.com/vi/Z_4qxpQkfXc/0.jpg" alt="Watch the Demo" width="100%" style="border-radius: 10px; box-shadow: 0px 4px 10px rgba(0,0,0,0.1);">
+  </a>
+  <p><em>Click the image above to watch the full demo on YouTube</em></p>
+</div>
+
+<br>
+
 | **Login Screen** | **Main Dashboard (Upcoming & History)** |
 | :---: | :---: |
 | <img src="documentations/login.png" alt="Login Screen" width="100%"> | <img src="documentations/dashboard.png" alt="Dashboard View" width="100%"> |
@@ -47,13 +57,13 @@ A visual overview of the application's key features and smart functionalities.
 To clone and run this application, you'll need [Git](https://git-scm.com) and [Node.js v18+](https://nodejs.org/) installed on your computer.
 
 > [!IMPORTANT]
-> **⚠️ CRITICAL STEP:** Before running the app (`npm run dev`), you **MUST** configure the database first. See the [Database Configuration](#database-configuration-%EF%B8%8F) section below.
+> Before running the app (`npm run dev`), you **MUST** configure the database first. See the [Database Configuration](#database-configuration-%EF%B8%8F) section below.
 
 From your command line:
 
 ```bash
 # 1. Clone this repository
-git clone https://github.com/jerrover/User-Appointment-Management-System
+git clone [https://github.com/jerrover/User-Appointment-Management-System](https://github.com/jerrover/User-Appointment-Management-System)
 
 # 2. Go into the project directory
 cd User-Appointment-Management-System
