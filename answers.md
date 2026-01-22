@@ -1,9 +1,5 @@
 # Technical Answers
 
-This document provides technical explanations regarding the implementation decisions and future improvements for the **Sari Tirta Appointment System**.
-
----
-
 ### 1. Timezone Conflicts
 **Q: How would you handle timezone conflicts between participants in an appointment?**
 
