@@ -12,16 +12,31 @@
 
 The Sari Tirta Appointment System is a robust web application built to solve the complexity of cross-timezone scheduling. It features intelligent validation logic that ensures appointments are only scheduled within valid working hours (08:00 - 17:00) for all participants, regardless of their location in the world.
 
-<img src="documentations/login.png" alt="image" border="0">
+<img src="documentations/login.png" alt="Sari Tirta Login" width="70%" border="0">
 
 </div>
+
+---
+
+## 📸 App Screenshots (Gallery)
+
+A visual overview of the application's key features and smart functionalities.
+
+| **Login Screen** | **Main Dashboard (Upcoming & History)** |
+| :---: | :---: |
+| <img src="documentations/login.png" alt="Login Screen" width="100%"> | <img src="documentations/dashboard.png" alt="Dashboard View" width="100%"> |
+| **Create New Appointment** | **Smart Time Recommendations** |
+| <img src="documentations/new.png" alt="Create Appointment Form" width="100%"> | <img src="documentations/newtime.png" alt="Timezone Recommendations" width="100%"> |
+| *Clean form with date pickers.* | *Automatically suggests valid slots based on invitees' locations.* |
+
+---
 
 <div align="left">
 
 <h1> 📑 Table of Contents </h1>
 
 - [Installation & Setup 💻](#installation--setup-)
-- [Database Configuration 🗄️](#database-configuration-)
+- [Database Configuration 🗄️](#database-configuration-%EF%B8%8F)
 - [Demo Accounts 🧪](#demo-accounts-)
 - [Features List 🔮](#features-list-)
 
@@ -29,19 +44,29 @@ The Sari Tirta Appointment System is a robust web application built to solve the
 
 ## Installation & Setup 💻
 
-To clone and run this application, you'll need [Git](https://git-scm.com) and [Node.js v18+](https://nodejs.org/) installed on your computer. From your command line:
+To clone and run this application, you'll need [Git](https://git-scm.com) and [Node.js v18+](https://nodejs.org/) installed on your computer.
 
-<br>
+> [!IMPORTANT]
+> **⚠️ CRITICAL STEP:** Before running the app (`npm run dev`), you **MUST** configure the database first. See the [Database Configuration](#database-configuration-%EF%B8%8F) section below.
+
+From your command line:
 
 ```bash
-# Clone this repository
-$ git clone [https://github.com/username/sari-tirta-app](https://github.com/username/sari-tirta-app)
-# Go into the repository
-$ cd sari-tirta-app
-# Install dependencies
-$ npm install
-# Run the app locally
-$ npm run dev
+# 1. Clone this repository
+git clone https://github.com/jerrover/User-Appointment-Management-System
+
+# 2. Go into the project directory
+cd User-Appointment-Management-System
+
+# 3. Install dependencies
+npm install
+
+# 4. Generate Prisma Client (Required to prevent DB errors)
+npx prisma generate
+
+# 5. Run the app locally
+# (Make sure you have set up the .env file as shown in the section below)
+npm run dev
 
 ```
 
@@ -60,10 +85,6 @@ $ mv .env.example .env
 # Windows (Command Prompt):
 $ ren .env.example .env
 
-# 3. (Optional) If you want to use your own database schema:
-$ npx prisma db push
-$ npx prisma db seed
-
 ```
 
 ## Demo Accounts 🧪
@@ -72,9 +93,9 @@ You can use these pre-registered accounts to simulate timezone conflicts without
 
 | Username | Role Scenario | Timezone | Notes |
 | --- | --- | --- | --- |
-| **tester** | Main User (You) | `Asia/Jakarta` | Use this to create appointments. |
-| **john** | European Colleague | `Europe/London` | Try inviting him at 08:00 WIB (Invalid). |
-| **sarah** | US Colleague | `America/New_York` | Try inviting her. |
+| **Jeremy** | Main User (You) | `Asia/Jakarta` | Use this to create appointments. |
+| **John Doe** | European Colleague | `Europe/London` | Try inviting him at 08:00 WIB (Invalid). |
+| **Sarah** | US Colleague | `America/New_York` | Try inviting her. |
 
 *(Note: The login system uses simple username authentication. No password is required.)*
 
@@ -85,6 +106,3 @@ You can use these pre-registered accounts to simulate timezone conflicts without
 * [x] <b>Secure Authentication:</b> Session-based login (JWT) with HTTP-Only Cookies protection.
 * [x] <b>Double-Side Validation:</b> Server-side logic to prevent scheduling errors via API manipulation.
 * [x] <b>Responsive UI:</b> Modern interface built with Tailwind CSS and Shadcn UI.
-* [ ] <b>Google Calendar Sync:</b> Two-way synchronization with personal calendars.
-* [ ] <b>Email Notifications:</b> SMTP integration for RSVP invitations.
-* [ ] <b>Recurring Appointments:</b> Support for weekly or monthly meeting series.
