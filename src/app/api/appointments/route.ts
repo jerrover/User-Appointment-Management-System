@@ -1,6 +1,6 @@
 import { db } from "@/lib/db";
 import { getSession } from "@/lib/auth";
-import { isWorkingHour, isWorkingHourEnd, toUTC } from "@/lib/timezone"; 
+import { isWorkingHour, isWorkingHourEnd } from "@/lib/timezone"; 
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
@@ -8,7 +8,7 @@ export async function POST(request: Request) {
   if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
 
   const body = await request.json();
-  const { title, start, end, participantId } = body;
+  const { title, start, end, participantIds } = body;
 
   const currentUser = await db.user.findUnique({ where: { id: session.sub as string } });
   if (!currentUser) return NextResponse.json({ error: "User not found" }, { status: 404 });
@@ -24,10 +24,14 @@ export async function POST(request: Request) {
      return NextResponse.json({ error: "Time is outside YOUR working hours (08:00 - 17:00)." }, { status: 400 });
   }
 
-  if (participantId) {
-    const participant = await db.user.findUnique({ where: { id: participantId } });
+  const idsToCheck = Array.isArray(participantIds) ? participantIds : [];
+  
+  if (idsToCheck.length > 0) {
+    const participants = await db.user.findMany({ 
+        where: { id: { in: idsToCheck } } 
+    });
     
-    if (participant) {
+    for (const participant of participants) {
         const isStartValid = isWorkingHour(startDateObj, participant.preferred_timezone);
         const isEndValid = isWorkingHourEnd(endDateObj, participant.preferred_timezone);
 
@@ -46,7 +50,7 @@ export async function POST(request: Request) {
       end: endDateObj,
       creatorId: currentUser.id,
       participants: {
-        connect: participantId ? [{ id: participantId }] : [],
+        connect: idsToCheck.map((id: string) => ({ id })),
       },
     },
   });

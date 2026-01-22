@@ -9,11 +9,10 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
 
-// List Timezone Umum (Bisa ditambah)
 const TIMEZONES = [
-  "Asia/Jakarta", // WIB
-  "Asia/Makassar", // WITA
-  "Asia/Jayapura", // WIT
+  "Asia/Jakarta",
+  "Asia/Makassar", 
+  "Asia/Jayapura", 
   "Asia/Singapore",
   "Europe/London",
   "America/New_York",
@@ -34,7 +33,6 @@ export default function ProfileModal({ user, open, onOpenChange }: ProfileModalP
 
   const handleSave = async () => {
     setLoading(true);
-    // Kita pakai API endpoint /api/users/me yang udah kita bahas sebelumnya
     const res = await fetch("/api/users/me", {
       method: "PATCH",
       body: JSON.stringify({ timezone }),
@@ -42,7 +40,7 @@ export default function ProfileModal({ user, open, onOpenChange }: ProfileModalP
 
     if (res.ok) {
       toast.success("Profile updated successfully");
-      router.refresh(); // Refresh halaman biar data di navbar & dashboard berubah
+      router.refresh(); 
       onOpenChange(false);
     } else {
       toast.error("Failed to update profile");
